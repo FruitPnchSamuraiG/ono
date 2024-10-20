@@ -1,9 +1,14 @@
 {
   "type": "module",
   "scripts": {
-    "build": "tsc"
+    "start:js": "nodemon ./dist/index.js",
+    "start:ts": "tsc -w",
+    "start": "concurrently npm:start:*"
   },
   "dependencies": {
     "socket.io": "^4.8.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
   }
 }
