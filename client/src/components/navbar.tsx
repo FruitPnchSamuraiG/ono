@@ -6,7 +6,7 @@ import { ModeToggle } from "./mode-toggle";
 export default function Navbar() {
   const router = useRouter();
   return (
-    <div className="sticky top-0 flex justify-between p-2">
+    <div className="sticky z-50 top-0 flex justify-between p-2">
       <div>
         <h1 className="bg-primary text-secondary p-1 font-semibold text-2xl">
           ONO

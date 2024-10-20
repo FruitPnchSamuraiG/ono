@@ -13,12 +13,12 @@ export interface Card {
   type: string,
 }
 
-interface Player {
+export interface Player {
   username: string,
   hand: Card[]
 }
 
-interface Room {
+export interface Room {
   roomId: number
   players: Player[],
   maxPlayers: number,
@@ -30,4 +30,4 @@ export const roomStateAtom = atom<Room>()
 export const playerAtom = atom<Player>()
 
 // initializing the socket
-export const socket = io("http://localhost:3000")
+export const socket = io("http://localhost:5000")

@@ -35,20 +35,20 @@ export default function Create() {
   const setPlayerState = useSetAtom(playerAtom)
   const router = useRouter()
   const onSubmit: SubmitHandler<CreateSchemaType> = (data) => {
-    socket.emit("create", data)
-    socket.once("roomState", message => {
+    socket.emit("join", data)
+    socket.on("roomState", message => {
       setPlayerState({username: data.username, hand: []})
       setRoomState(message)
+      toast.success(`You have successfully joined the room ${data.roomId}!`)
+      router.push('/play')
     })
-    toast.success(`Room ${data.roomId} has been created!`)
-    router.push('play')
   };
   return (
     <div className="flex flex-col justify-center items-center w-full h-screen">
       <Card className="w-fit">
         <CardHeader>
-          <CardTitle>Create a room</CardTitle>
-          <CardDescription>Room banade, nhi toh abhi se 8 card</CardDescription>
+          <CardTitle>Join a room</CardTitle>
+          <CardDescription>Room join karle, nhi toh abhi se 8 card</CardDescription>
         </CardHeader>
         <CardContent >
           <form className="space-y-2"  onSubmit={handleSubmit(onSubmit)}>
