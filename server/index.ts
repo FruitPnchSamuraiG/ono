@@ -1,6 +1,6 @@
 import { createServer } from "http";
 import { Server } from 'socket.io';
-import { dealCards, initializeDeck, validateMove } from "./utils.js";
+import { dealCards, initializeDeck, updatePlayerTurn, validateMove, validateWin } from "./utils.js";
 
 // here initializing the http and web-sockets server
 const httpServer = createServer()
@@ -10,22 +10,24 @@ const io = new Server(httpServer, {
   },
 });
 
+let games: Room[] = []
 // basic rundown, for connection
 io.on("connection", (socket) => {
-  let games: Room[] = []
-  socket.on("create", (message: Room) => {
+  socket.on("create", (message: Room & { username: string }) => {
     // initializing a deck of 110
     const drawDeck = initializeDeck()
     // popping of the first card and adding it to the discard deck
     const firstCard = drawDeck.pop()
-
+    const { deck, hand } = dealCards(drawDeck, 8)
     // initializing basic gamestate properties
     const gameState: GameState = {
       currentPlayerIndex: 0,
       direction: 1,
       discardDeck: [],
-      drawDeck: drawDeck
+      drawDeck: deck
     }
+    message.players = [{ username: message.username, hand: hand }]
+    message.maxPlayers = 8
     // typescript shennanigans , I think I misspelled it
     if (firstCard) {
       gameState.discardDeck.push(firstCard)
@@ -35,6 +37,7 @@ io.on("connection", (socket) => {
     message.gameState = gameState
     // adding the current game to the central state
     games.push(message)
+    socket.emit("roomState", games.at(-1))
     socket.join(String(message.roomId))
     io.to(String(message.roomId)).emit("roomCreated", message)
   })
@@ -46,7 +49,7 @@ io.on("connection", (socket) => {
       // dealing cards
       const { deck, hand } = dealCards(room.gameState.drawDeck, 8)
       // adding the player in the list
-      const currentPlayer: Player = { username: message.userName, hand: hand }
+      const currentPlayer: Player = { username: message.username, hand: hand }
 
       // updating room state
       room = { ...room, players: [...room.players, currentPlayer], gameState: { ...room.gameState, drawDeck: deck } }
@@ -54,31 +57,37 @@ io.on("connection", (socket) => {
       games = games.filter(game => game.roomId != room?.roomId)
       games.push(room)
 
+      socket.emit("roomState", room)
       // joining the room
       socket.join(message.roomId)
-      io.to(String(room.roomId)).emit("newJoinee", `${message.username} has joined the room!`)
+      io.to(String(room.roomId)).emit("newJoinee", room)
     }
   })
 
   socket.on("play", message => {
-    /*
-        {
-          roomId,
-          card,
-          userName
-        }
-      */
     const room = games.find(val => val.roomId == message.roomId)
     const roomIndex = games.findIndex(val => val.roomId == message.roomId)
     const player = room?.players.find(val => val.username == message.username)
     const playerIndex = room?.players.findIndex(val => val.username == message.username)
-    if (room && playerIndex) {
+    if (room && playerIndex != -1 && playerIndex != undefined) {
       const topMostCard = room.gameState.discardDeck.at(-1)
       if (topMostCard && validateMove(topMostCard, message.card)) {
         // this means we can play the move
-        if (player && player.hand) player.hand.pop()
+        if (player && player.hand.length > 0) {
+          // removing the player
+          if (validateWin(player?.hand)) {
+            socket.emit('winner', player.username)
+            room.players = room.players.filter(val => val.username == player.username)
+          }
+          else player.hand = player.hand.filter((val, index) => index != message.index)
+        }
+        // updating the discard deck
         room.gameState.discardDeck.push(message.card)
+        // updating the current player
+        room.gameState.currentPlayerIndex = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex)
+        console.log('Can play',room)
         games[roomIndex] = room
+        socket.emit("roomState", room);
       } else {
         // pick-up 8 cards
         const utha = room.gameState.drawDeck.slice(-8)
@@ -89,9 +98,11 @@ io.on("connection", (socket) => {
         }
         // removing cards from the draw deck
         for (let i = 0; i < 8; i++) room.gameState.drawDeck.pop()
+        room.gameState.currentPlayerIndex = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex)
         games[roomIndex] = room
+        socket.emit("roomState", room);
+        socket.emit("notification", `${player?.username} ne 8 uthaye`)
       }
-      socket.emit("updateHand", player);
     }
   })
 
@@ -99,4 +110,4 @@ io.on("connection", (socket) => {
     games = games.filter(val => val != message)
   })
 });
-io.listen(3000)
+io.listen(5000)

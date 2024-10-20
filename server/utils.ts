@@ -45,9 +45,19 @@ export function dealCards(deck: Card[], n: number) {
 }
 
 export function validateMove(topMostCard: Card, currentCard: Card){
-  if (currentCard.type == topMostCard.type || currentCard.type == 'special') {
+  if (currentCard.value == topMostCard.value || currentCard.type == topMostCard.type || currentCard.type == 'special') {
     return true;
   } else return false
+}
+
+export function updatePlayerTurn(length:number, current:number){
+  if(current == length-1) return 0;
+  else return current+1;
+}
+
+export function validateWin(playerHand: Card[]){
+  if(playerHand.length == 1) return true
+  else return false
 }
 
 export function calculateStacked(discardDeck: Card[]){
