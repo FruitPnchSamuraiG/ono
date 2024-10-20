@@ -1,0 +1,9 @@
+{
+  "type": "module",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "socket.io": "^4.8.0"
+  }
+}
