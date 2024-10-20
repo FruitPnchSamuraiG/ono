@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
+import { ModeToggle } from "./mode-toggle";
 
 export default function Navbar() {
   const router = useRouter();
@@ -14,6 +15,7 @@ export default function Navbar() {
       <div className="flex gap-2">
         <Button onClick={()=>router.push('/create')} variant="default">Create</Button>
         <Button onClick={()=>router.push('/join')} variant="secondary">Join</Button>
+        <ModeToggle />
       </div>
     </div>
   );
