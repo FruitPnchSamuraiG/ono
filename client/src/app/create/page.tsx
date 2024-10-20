@@ -1,5 +1,5 @@
 "use client";
-import { roomStateAtom, socket } from "@/atom";
+import { playerAtom, roomStateAtom, socket } from "@/atom";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -32,10 +32,12 @@ export default function Create() {
     formState: { errors },
   } = useForm<CreateSchemaType>({ resolver: zodResolver(CreateSchema) });
   const setRoomState = useSetAtom(roomStateAtom)
+  const setPlayerState = useSetAtom(playerAtom)
   const router = useRouter()
   const onSubmit: SubmitHandler<CreateSchemaType> = (data) => {
     socket.emit("create", data)
     socket.on("roomState", message => {
+      setPlayerState({username: data.username, hand: []})
       setRoomState(message)
       toast.success(`Room ${data.roomId} has been created!`)
       router.push('play')
