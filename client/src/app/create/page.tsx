@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useSetAtom } from "jotai";
 import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const CreateSchema = z.object({
@@ -36,6 +37,7 @@ export default function Create() {
     socket.emit("create", data)
     socket.on("roomState", message => {
       setRoomState(message)
+      toast.success(`Room ${data.roomId} has been created!`)
       router.push('play')
     })
   };
