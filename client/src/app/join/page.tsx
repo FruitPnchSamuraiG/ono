@@ -39,10 +39,10 @@ export default function Create() {
     socket.on("roomState", message => {
       setPlayerState({username: data.username, hand: []})
       setRoomState(message)
-      toast.success(`You have successfully joined the room ${data.roomId}!`)
-      router.push('/play')
     })
-  };
+    toast.success(`You have successfully joined the room ${data.roomId}!`)
+    router.push('/play')
+};
   return (
     <div className="flex flex-col justify-center items-center w-full h-screen">
       <Card className="w-fit">
