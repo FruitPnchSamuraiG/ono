@@ -39,8 +39,6 @@ export default function Create() {
     socket.on("roomState", message => {
       setPlayerState({username: data.username, hand: []})
       setRoomState(message)
-      console.log("please don't update here");
-      
     })
     toast.success(`Room ${data.roomId} has been created!`)
     router.push('play')
