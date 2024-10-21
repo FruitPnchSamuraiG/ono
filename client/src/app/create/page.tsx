@@ -36,9 +36,11 @@ export default function Create() {
   const router = useRouter()
   const onSubmit: SubmitHandler<CreateSchemaType> = (data) => {
     socket.emit("create", data)
-    socket.once("roomState", message => {
+    socket.on("roomState", message => {
       setPlayerState({username: data.username, hand: []})
       setRoomState(message)
+      console.log("please don't update here");
+      
     })
     toast.success(`Room ${data.roomId} has been created!`)
     router.push('play')

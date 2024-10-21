@@ -15,7 +15,7 @@ export interface Card {
 
 export interface Player {
   username: string,
-  hand: Card[]
+  hand: Card[],
 }
 
 export interface Room {

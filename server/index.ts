@@ -1,6 +1,6 @@
 import { createServer } from "http";
 import { Server } from 'socket.io';
-import { dealCards, initializeDeck, updatePlayerTurn, validateMove, validateWin } from "./utils.js";
+import { calculateStacked, dealCards, initializeDeck, updatePlayerTurn, validateMove, validateWin } from "./utils.js";
 
 // here initializing the http and web-sockets server
 const httpServer = createServer()
@@ -76,7 +76,7 @@ io.on("connection", (socket) => {
         if (player && player.hand.length > 0) {
           // removing the player
           if (validateWin(player?.hand)) {
-            socket.emit('winner', player.username)
+            io.to(String(room.roomId)).emit('notification', `${player.username} has finished the game!`)
             room.players = room.players.filter(val => val.username == player.username)
           }
           else player.hand = player.hand.filter((val, index) => index != message.index)
@@ -85,9 +85,9 @@ io.on("connection", (socket) => {
         room.gameState.discardDeck.push(message.card)
         // updating the current player
         room.gameState.currentPlayerIndex = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex)
-        console.log('Can play',room)
         games[roomIndex] = room
-        socket.emit("roomState", room);
+        // emitting to everyone in the room
+        io.to(String(room.roomId)).emit("roomState", room)
       } else {
         // pick-up 8 cards
         const utha = room.gameState.drawDeck.slice(-8)
@@ -100,9 +100,33 @@ io.on("connection", (socket) => {
         for (let i = 0; i < 8; i++) room.gameState.drawDeck.pop()
         room.gameState.currentPlayerIndex = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex)
         games[roomIndex] = room
-        socket.emit("roomState", room);
-        socket.emit("notification", `${player?.username} ne 8 uthaye`)
+        // emitting to everyone in the room
+        io.to(String(room.roomId)).emit("roomState", room)
+        io.to(String(room.roomId)).emit("notification", `${player?.username} ne 8 uthaye`)
       }
+    }
+  })
+
+  socket.on('draw', message => {
+    const room = games.find(val => val.roomId == message.roomId)
+    const roomIndex = games.findIndex(val => val.roomId == message.roomId)
+    const player = room?.players.find(val => val.username == message.username)
+    const playerIndex = room?.players.findIndex(val => val.username == message.username)
+    if (room && playerIndex != -1 && playerIndex != undefined) {
+      // passing the discard deck here to calculate how many need to be picked up
+      const uthaneKitne = calculateStacked(room.gameState.discardDeck)
+      const utha = room.gameState.drawDeck.slice(-uthaneKitne)
+      // updating local player and room state
+      if (player && player.hand) {
+        player.hand = player.hand.concat(utha)
+        room.players[playerIndex] = player
+      }
+
+      for (let i = 0; i < uthaneKitne; i++) room.gameState.drawDeck.pop()
+      room.gameState.currentPlayerIndex = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex)
+      games[roomIndex] = room
+      io.to(String(room.roomId)).emit("roomState", room)
+      io.to(String(room.roomId)).emit("notification", `${player?.username} ne ${uthaneKitne} uthaye`)
     }
   })
 

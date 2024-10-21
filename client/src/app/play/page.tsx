@@ -1,6 +1,7 @@
 "use client";
 import { Card, playerAtom, Room, roomStateAtom, socket } from "@/atom";
 import OnoCard from "@/components/ono-card";
+import { RainbowButton } from "@/components/ui/rainbow-button";
 import { Separator } from "@/components/ui/separator";
 import { useAtom } from "jotai";
 import Image from "next/image";
@@ -11,13 +12,14 @@ export default function Play() {
   // declaring the hooks
   const [roomState, setRoomState] = useAtom(roomStateAtom);
   const [playerState, setPlayerState] = useAtom(playerAtom);
-
+  const currentPlayerIndex = roomState?.players.findIndex(
+    (val) => val.username == playerState?.username
+  );
   function updatePlayerState(room: Room) {
     // now we need to extract the player details from the gameState
     const currentPlayer = room?.players.find(
       (val) => val.username == playerState?.username
     );
-    // const currentPlayerIndex = roomState?.players.findIndex(val => val.username == currentPlayer?.username)
     setPlayerState(currentPlayer);
   }
 
@@ -31,35 +33,46 @@ export default function Play() {
       updatePlayerState(message);
     });
     socket.on("notification", (message) => {
-      toast.info(message)
-    })
+      toast.info(message);
+    });
     // now we need to extract the player details from the gameState
     const currentPlayer = roomState?.players.find(
       (val) => val.username == playerState?.username
     );
+
     // const currentPlayerIndex = roomState?.players.findIndex(val => val.username == currentPlayer?.username)
     setPlayerState(currentPlayer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {}, []);
 
   function handleClick(card: Card, index: number) {
     const currentPlayerIndex = roomState?.players.findIndex(
       (val) => val.username == playerState?.username
     );
-    if (currentPlayerIndex != -1 && currentPlayerIndex == roomState?.gameState.currentPlayerIndex) {
+    if (
+      currentPlayerIndex != -1 &&
+      currentPlayerIndex == roomState?.gameState.currentPlayerIndex
+    ) {
       socket.emit("play", {
         card: card,
         roomId: roomState?.roomId,
         username: playerState?.username,
-        index: index
+        index: index,
       });
     } else {
       toast.error("Tera turn nhi hai champ");
     }
   }
 
+  function handleDraw(){
+    socket.emit('draw',{roomId: roomState?.roomId, username: playerState?.username})
+  }
+
   return (
     <div className="relative flex flex-col w-full h-screen">
-      <div className="absolute flex flex-col justify-center items-start p-2 gap-2">
+      <div className="fixed z-50 flex flex-col justify-center items-start p-2 gap-2">
         <div className="">
           <h1 className="">Players in the room</h1>
           <Separator />
@@ -73,10 +86,14 @@ export default function Play() {
               }`}
               key={index}
             >
-              {val.username}
+              {val.username == playerState?.username
+                ? playerState.username + " (You)"
+                : val.username}
             </div>
           );
         })}
+        <Separator />
+        {currentPlayerIndex == roomState?.gameState.currentPlayerIndex && <RainbowButton className="cursor-pointer" onClick={() => {handleDraw()}}>Utha le</RainbowButton>}
       </div>
       <div className="relative flex flex-col justify-center items-center">
         <OnoCard
