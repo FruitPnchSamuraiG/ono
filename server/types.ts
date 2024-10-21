@@ -3,6 +3,7 @@ interface Room {
   players: Player[],
   maxPlayers: number,
   gameState: GameState
+  lastActive: number, // this is in milliseconds 
 }
 
 interface Player {
@@ -20,5 +21,5 @@ interface GameState {
   discardDeck: Card[]
   currentPlayerIndex: number,
   direction: number, 
-  winners: string[]
+  winners: string[],
 }

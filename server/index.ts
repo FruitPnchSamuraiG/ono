@@ -40,6 +40,7 @@ io.on("connection", (socket) => {
       socket._error('Deck is empty')
     }
     message.gameState = gameState
+    message.lastActive = Date.now()
     // adding the current game to the central state
     games.push(message)
     socket.emit("roomState", games.at(-1))
@@ -61,6 +62,7 @@ io.on("connection", (socket) => {
       room = { ...room, players: [...room.players, currentPlayer], gameState: { ...room.gameState, drawDeck: deck } }
       // updating the central games state
       games = games.filter(game => game.roomId != room?.roomId)
+      room.lastActive = Date.now()
       games.push(room)
 
       // joining the room
@@ -91,6 +93,7 @@ io.on("connection", (socket) => {
         room.gameState.discardDeck.push(message.card)
         // updating the current player
         room.gameState.currentPlayerIndex = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex, message.card.value)
+        room.lastActive = Date.now()
         games[roomIndex] = room
         // emitting to everyone in the room
         io.to(String(room.roomId)).emit("roomState", room)
@@ -105,6 +108,7 @@ io.on("connection", (socket) => {
         // removing cards from the draw deck
         for (let i = 0; i < 8; i++) room.gameState.drawDeck.pop()
         room.gameState.currentPlayerIndex = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex)
+        room.lastActive = Date.now()
         games[roomIndex] = room
         // emitting to everyone in the room
         io.to(String(room.roomId)).emit("roomState", room)
@@ -131,6 +135,7 @@ io.on("connection", (socket) => {
       for (let i = 0; i < uthaneKitne; i++) room.gameState.drawDeck.pop()
       if(uthaneKitne > 1) room.gameState.discardDeck.push({type: "blank", value: "blank"})
       room.gameState.currentPlayerIndex = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex)
+      room.lastActive = Date.now()
       games[roomIndex] = room
       io.to(String(room.roomId)).emit("roomState", room)
       io.to(String(room.roomId)).emit("notification", `${player?.username} ne ${uthaneKitne} uthaye`)
@@ -141,4 +146,20 @@ io.on("connection", (socket) => {
     games = games.filter(val => val != message)
   })
 });
+
+// inactive time threshold
+const inactiveTimeThreshold = 5 * 60 * 1000
+
+setInterval(()=>{
+  const currTime = Date.now()
+  games = games.filter(game => {
+    if(currTime - game.lastActive > inactiveTimeThreshold){
+      io.to(String(game.roomId)).emit('notification', 'Becauses of Inactivity, the room has been off-loaded.')
+      io.in(String(game.roomId)).disconnectSockets()
+      return false;
+    }
+    return true;
+  })
+},60000)
+
 io.listen(5000)
