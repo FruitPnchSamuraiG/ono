@@ -1,10 +1,12 @@
 "use client";
 import { playerAtom, roomStateAtom, socket } from "@/atom";
+import { Rules } from "@/components/rules";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -61,6 +63,9 @@ export default function Create() {
             </Button>
           </form>
         </CardContent>
+        <CardFooter>
+          <Rules />
+        </CardFooter>
       </Card>
     </div>
   );

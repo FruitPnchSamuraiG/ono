@@ -7,7 +7,7 @@ export default function Navbar() {
   const router = useRouter();
   return (
     <div className="sticky z-50 top-0 flex justify-between p-2">
-      <div>
+      <div onClick={()=>{router.push('/')}} className="cursor-pointer">
         <h1 className="bg-primary text-secondary p-1 font-semibold text-2xl">
           ONO
         </h1>
