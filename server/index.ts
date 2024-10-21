@@ -81,7 +81,7 @@ io.on("connection", (socket) => {
           }
           else player.hand = player.hand.filter((val, index) => index != message.index)
         }
-        // updating the discard deck
+        // updating the discard deck, we can optimize this here by only having stackable cards in the discard deck (not yet)
         room.gameState.discardDeck.push(message.card)
         // updating the current player
         room.gameState.currentPlayerIndex = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex)
@@ -113,7 +113,7 @@ io.on("connection", (socket) => {
     const player = room?.players.find(val => val.username == message.username)
     const playerIndex = room?.players.findIndex(val => val.username == message.username)
     if (room && playerIndex != -1 && playerIndex != undefined) {
-      // passing the discard deck here to calculate how many need to be picked up
+      // passing the discard deck here to calculate how many need to be picked up 
       const uthaneKitne = calculateStacked(room.gameState.discardDeck)
       const utha = room.gameState.drawDeck.slice(-uthaneKitne)
       // updating local player and room state

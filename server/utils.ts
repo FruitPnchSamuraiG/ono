@@ -1,6 +1,8 @@
 const values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 'skip', 'draw2', 'reverse']
 const colours = ['red', 'yellow', 'green', 'blue']
-const specials = [{ value: "draw4", type: "special" }, { value: "colorChange", type: "special" }]
+const specials = [{ value: "draw4", type: "special" },
+  // { value: "colorChange", type: "special" }
+]
 
 export function shuffle(array: Card[]) {
   let currentIndex = array.length;
@@ -44,47 +46,30 @@ export function dealCards(deck: Card[], n: number) {
   return { deck, hand }
 }
 
-export function validateMove(topMostCard: Card, currentCard: Card){
+export function validateMove(topMostCard: Card, currentCard: Card) {
   if (currentCard.value == topMostCard.value || currentCard.type == topMostCard.type || currentCard.type == 'special') {
     return true;
   } else return false
 }
 
-export function updatePlayerTurn(length:number, current:number){
-  if(current == length-1) return 0;
-  else return current+1;
+export function updatePlayerTurn(length: number, current: number) {
+  if (current == length - 1) return 0;
+  else return current + 1;
 }
 
-export function validateWin(playerHand: Card[]){
-  if(playerHand.length == 1) return true
+export function validateWin(playerHand: Card[]) {
+  if (playerHand.length == 1) return true
   else return false
 }
 
-export function calculateStacked(discardDeck: Card[]){
+export function calculateStacked(discardDeck: Card[]) {
   //  calculating the number of stacked draw2 and draw4
   let numberOfCards = 1
-  for(let i = discardDeck.length-1; i >= 0; i--){
+  for (let i = discardDeck.length - 1; i >= 0; i--) {
     const curr = discardDeck[i]
-    if(curr.type != "special" || curr.value == "colourChange") break;
-    if(curr.value == "draw4") numberOfCards += 4
-    if(curr.value == "draw2") numberOfCards += 2
+    if (curr.type != "special" || curr.value == "colourChange") break;
+    if (curr.value == "draw4") numberOfCards += 4
+    if (curr.value == "draw2") numberOfCards += 2
   }
   return numberOfCards
 }
-
-// function cantPlayMove(discardDeck: Card[]){
-//   const topMostCard = discardDeck.at(-1)
-//   let numberOfCards = 1; // how many cards to pickup
-//   switch (topMostCard?.value) {
-//     case 'draw2':
-//       numberOfCards = calculateStacked(discardDeck)
-//       break;
-//     case 'draw4':
-//       numberOfCards = calculateStacked(discardDeck)
-//       numberOfCards = 4;
-//     default:
-//       break;
-//   }
-
-//   return numberOfCards
-// }
