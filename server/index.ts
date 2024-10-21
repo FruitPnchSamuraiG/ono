@@ -58,10 +58,9 @@ io.on("connection", (socket) => {
       games = games.filter(game => game.roomId != room?.roomId)
       games.push(room)
 
-      socket.emit("roomState", room)
       // joining the room
       socket.join(message.roomId)
-      io.to(String(room.roomId)).emit("newJoinee", room)
+      io.to(String(room.roomId)).emit("roomState", room)
     }
   })
 
@@ -75,10 +74,10 @@ io.on("connection", (socket) => {
       if (topMostCard && validateMove(topMostCard, message.card)) {
         // this means we can play the move
         if (player && player.hand.length > 0) {
-          // removing the player
+            // removing the player
           if (validateWin(player?.hand)) {
             io.to(String(room.roomId)).emit('notification', `${player.username} has finished the game!`)
-            room.players = room.players.filter(val => val.username == player.username)
+            room.players = room.players.filter(val => val.username != player.username)
             room.gameState.winners.push(player.username)
           }
           else player.hand = player.hand.filter((val, index) => index != message.index)
@@ -86,7 +85,7 @@ io.on("connection", (socket) => {
         // updating the discard deck, we can optimize this here by only having stackable cards in the discard deck (not yet)
         room.gameState.discardDeck.push(message.card)
         // updating the current player
-        room.gameState.currentPlayerIndex = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex)
+        room.gameState.currentPlayerIndex = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex, message.card.value)
         games[roomIndex] = room
         // emitting to everyone in the room
         io.to(String(room.roomId)).emit("roomState", room)
