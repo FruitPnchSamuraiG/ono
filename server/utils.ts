@@ -70,12 +70,12 @@ export function calculateStacked(discardDeck: Card[]) {
   let numberOfCards = 0
   for (let i = discardDeck.length - 1; i >= 0; i--) {
     const curr = discardDeck[i]
-    if (curr.type != "special" || curr.value == "colourChange") {
+    if (curr.value == "draw4") numberOfCards += 4
+    else if (curr.value == "draw2") numberOfCards += 2
+    else {
       if (i == discardDeck.length - 1) numberOfCards++ // this fixes an off by one error jab uthana padta hai
       break;
     }
-    if (curr.value == "draw4") numberOfCards += 4
-    if (curr.value == "draw2") numberOfCards += 2
   }
   return numberOfCards
 }
