@@ -27,10 +27,7 @@ export default function Play() {
     socket.on("roomState", (message) => {
       setRoomState(message);
       updatePlayerState(message);
-    });
-    socket.on("newJoinee", (message) => {
-      setRoomState(message);
-      updatePlayerState(message);
+      console.log(roomState)
     });
     socket.on("notification", (message) => {
       toast.info(message);
@@ -44,8 +41,6 @@ export default function Play() {
     setPlayerState(currentPlayer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {}, []);
 
   function handleClick(card: Card, index: number) {
     const currentPlayerIndex = roomState?.players.findIndex(
@@ -121,7 +116,7 @@ export default function Play() {
         <Image src={"/chatai.png"} alt="chatai" width={700} height={500} />
       </div>
       <div className="flex justify-center items-center gap-2 ">
-        {playerState?.hand.map((card, index) => {
+        {!roomState?.gameState.winners.includes(String(playerState?.username)) ? playerState?.hand.map((card, index) => {
           return (
             <OnoCard
               onClick={() => {
@@ -133,7 +128,7 @@ export default function Play() {
               type={card.type}
             />
           );
-        })}
+        }) : <h1>You won bro, 8 uthane hai kya fir bhi?</h1>}
       </div>
     </div>
   );
