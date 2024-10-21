@@ -3,6 +3,8 @@
   "scripts": {
     "start:js": "nodemon ./dist/index.js",
     "start:ts": "tsc -w",
+    "build": "tsc",
+    "prod": "node ./dist/index.js",
     "start": "concurrently npm:start:*"
   },
   "dependencies": {
