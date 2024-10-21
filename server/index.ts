@@ -24,7 +24,8 @@ io.on("connection", (socket) => {
       currentPlayerIndex: 0,
       direction: 1,
       discardDeck: [],
-      drawDeck: deck
+      drawDeck: deck,
+      winners: [],
     }
     message.players = [{ username: message.username, hand: hand }]
     message.maxPlayers = 8
@@ -78,6 +79,7 @@ io.on("connection", (socket) => {
           if (validateWin(player?.hand)) {
             io.to(String(room.roomId)).emit('notification', `${player.username} has finished the game!`)
             room.players = room.players.filter(val => val.username == player.username)
+            room.gameState.winners.push(player.username)
           }
           else player.hand = player.hand.filter((val, index) => index != message.index)
         }
