@@ -6,9 +6,12 @@ import { calculateStacked, dealCards, initializeDeck, updatePlayerTurn, validate
 const httpServer = createServer()
 const io = new Server(httpServer, {
   cors: {
-    origin: "*",
-  },
+      origin: "*", // Allow all origins or specify your client URL
+      methods: ["GET", "POST"],
+      credentials: true
+  }
 });
+
 
 let games: Room[] = []
 // basic rundown, for connection
