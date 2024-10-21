@@ -47,6 +47,7 @@ export function dealCards(deck: Card[], n: number) {
 }
 
 export function validateMove(topMostCard: Card, currentCard: Card) {
+  if(topMostCard.value == 'draw2' && (currentCard.value != "draw2" && currentCard.value != "draw4")) return false
   if (currentCard.value == topMostCard.value || currentCard.type == topMostCard.type || currentCard.type == 'special' || topMostCard.type == 'blank') {
     return true;
   } else return false
