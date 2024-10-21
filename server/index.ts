@@ -14,6 +14,7 @@ let games: Room[] = []
 // basic rundown, for connection
 io.on("connection", (socket) => {
   socket.on("create", (message: Room & { username: string }) => {
+    console.log(message.username, "created a room")
     // initializing a deck of 110
     const drawDeck = initializeDeck()
     // popping of the first card and adding it to the discard deck
@@ -44,6 +45,7 @@ io.on("connection", (socket) => {
   })
 
   socket.on("join", message => {
+    console.log(message.username, `joined the room ${message.roomId}`)
     let room = games.find(val => val.roomId == message.roomId)
     // ensuring that a room exists and there is space
     if (room && room.players.length != room.maxPlayers) {
