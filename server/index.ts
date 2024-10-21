@@ -6,9 +6,9 @@ import { calculateStacked, dealCards, initializeDeck, updatePlayerTurn, validate
 const httpServer = createServer()
 const io = new Server(httpServer, {
   cors: {
-      origin: "*", // Allow all origins or specify your client URL
-      methods: ["GET", "POST"],
-      credentials: true
+    origin: "*", // Allow all origins or specify your client URL
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
@@ -81,7 +81,7 @@ io.on("connection", (socket) => {
       if (topMostCard && validateMove(topMostCard, message.card)) {
         // this means we can play the move
         if (player && player.hand.length > 0) {
-            // removing the player
+          // removing the player
           if (validateWin(player?.hand)) {
             io.to(String(room.roomId)).emit('notification', `${player.username} has finished the game!`)
             room.players = room.players.filter(val => val.username != player.username)
@@ -92,7 +92,9 @@ io.on("connection", (socket) => {
         // updating the discard deck, we can optimize this here by only having stackable cards in the discard deck (not yet)
         room.gameState.discardDeck.push(message.card)
         // updating the current player
-        room.gameState.currentPlayerIndex = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex, message.card.value)
+        const { turn, direction } = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex, room.gameState.direction)
+        room.gameState.currentPlayerIndex = turn
+        room.gameState.direction = direction
         room.lastActive = Date.now()
         games[roomIndex] = room
         // emitting to everyone in the room
@@ -107,8 +109,11 @@ io.on("connection", (socket) => {
         }
         // removing cards from the draw deck
         for (let i = 0; i < 8; i++) room.gameState.drawDeck.pop()
-        room.gameState.currentPlayerIndex = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex)
+        const { turn, direction } = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex, room.gameState.direction)
+        room.gameState.currentPlayerIndex = turn
+        room.gameState.direction = direction
         room.lastActive = Date.now()
+        if(room.gameState.discardDeck.at(-1)?.value == "draw2" || "draw4") room.gameState.discardDeck.push({ type: "blank", value: "blank" })
         games[roomIndex] = room
         // emitting to everyone in the room
         io.to(String(room.roomId)).emit("roomState", room)
@@ -133,8 +138,10 @@ io.on("connection", (socket) => {
       }
 
       for (let i = 0; i < uthaneKitne; i++) room.gameState.drawDeck.pop()
-      if(uthaneKitne > 1) room.gameState.discardDeck.push({type: "blank", value: "blank"})
-      room.gameState.currentPlayerIndex = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex)
+      if (uthaneKitne > 1) room.gameState.discardDeck.push({ type: "blank", value: "blank" })
+      const { turn, direction } = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex, room.gameState.direction)
+      room.gameState.currentPlayerIndex = turn
+      room.gameState.direction = direction
       room.lastActive = Date.now()
       games[roomIndex] = room
       io.to(String(room.roomId)).emit("roomState", room)
@@ -150,16 +157,18 @@ io.on("connection", (socket) => {
 // inactive time threshold
 const inactiveTimeThreshold = 5 * 60 * 1000
 
-setInterval(()=>{
+// offloading inactive games
+setInterval(() => {
   const currTime = Date.now()
   games = games.filter(game => {
-    if(currTime - game.lastActive > inactiveTimeThreshold){
+    if (currTime - game.lastActive > inactiveTimeThreshold) {
       io.to(String(game.roomId)).emit('notification', 'Becauses of Inactivity, the room has been off-loaded.')
       io.in(String(game.roomId)).disconnectSockets()
+      console.log('Closed room', game.roomId)
       return false;
     }
     return true;
   })
-},60000)
+}, 60000)
 
 io.listen(5000)

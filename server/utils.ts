@@ -47,18 +47,19 @@ export function dealCards(deck: Card[], n: number) {
 }
 
 export function validateMove(topMostCard: Card, currentCard: Card) {
-  if(topMostCard.value == 'draw2' && (currentCard.value != "draw2" && currentCard.value != "draw4")) return false
+  if (topMostCard.value == 'draw2' && (currentCard.value != "draw2" && currentCard.value != "draw4")) return false
   if (currentCard.value == topMostCard.value || currentCard.type == topMostCard.type || currentCard.type == 'special' || topMostCard.type == 'blank') {
     return true;
   } else return false
 }
 
-export function updatePlayerTurn(length: number, current: number, cardValue?: string): number {
+export function updatePlayerTurn(length: number, current: number, direction: number, cardValue?: string) {
   let turn = current;
+  if (cardValue == "reverse") direction = direction * -1
   if (cardValue == "skip") {
-    turn = (current + 2) % length 
-  } else turn = (current + 1) % length 
-  return turn
+    turn = (current + (2 * direction)) % length
+  } else turn = (current + (1 * direction)) % length
+  return {turn, direction}
 }
 
 export function validateWin(playerHand: Card[]) {
