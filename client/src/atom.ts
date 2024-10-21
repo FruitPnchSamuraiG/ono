@@ -31,4 +31,4 @@ export const roomStateAtom = atom<Room>()
 export const playerAtom = atom<Player>()
 
 // initializing the socket
-export const socket = io(process.env.NEXT_PUBLIC_API || "http://localhost:5000")
+export const socket = io(process.env.NEXT_PUBLIC_API)
