@@ -47,7 +47,7 @@ export function dealCards(deck: Card[], n: number) {
 }
 
 export function validateMove(topMostCard: Card, currentCard: Card) {
-  if (currentCard.value == topMostCard.value || currentCard.type == topMostCard.type || currentCard.type == 'special') {
+  if (currentCard.value == topMostCard.value || currentCard.type == topMostCard.type || currentCard.type == 'special' || topMostCard.type == 'blank') {
     return true;
   } else return false
 }
@@ -64,10 +64,13 @@ export function validateWin(playerHand: Card[]) {
 
 export function calculateStacked(discardDeck: Card[]) {
   //  calculating the number of stacked draw2 and draw4
-  let numberOfCards = 1
+  let numberOfCards = 0
   for (let i = discardDeck.length - 1; i >= 0; i--) {
     const curr = discardDeck[i]
-    if (curr.type != "special" || curr.value == "colourChange") break;
+    if (curr.type != "special" || curr.value == "colourChange") {
+      if(i == discardDeck.length - 1) numberOfCards++ // this fixes an off by one error jab uthana padta hai
+      break;
+    }
     if (curr.value == "draw4") numberOfCards += 4
     if (curr.value == "draw2") numberOfCards += 2
   }

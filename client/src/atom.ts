@@ -6,6 +6,7 @@ export interface GameState {
   discardDeck: Card[]
   currentPlayerIndex: number,
   direction: number, 
+  winners: string[]
 }
 
 export interface Card {

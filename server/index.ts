@@ -125,6 +125,7 @@ io.on("connection", (socket) => {
       }
 
       for (let i = 0; i < uthaneKitne; i++) room.gameState.drawDeck.pop()
+      if(uthaneKitne > 1) room.gameState.discardDeck.push({type: "blank", value: "blank"})
       room.gameState.currentPlayerIndex = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex)
       games[roomIndex] = room
       io.to(String(room.roomId)).emit("roomState", room)

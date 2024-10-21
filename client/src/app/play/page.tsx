@@ -73,6 +73,23 @@ export default function Play() {
   return (
     <div className="relative flex flex-col w-full h-screen">
       <div className="fixed z-50 flex flex-col justify-center items-start p-2 gap-2">
+        {roomState?.gameState.winners &&  roomState?.gameState.winners.length > 0 && <>
+            <div>
+              <h1>Winners</h1>
+              <Separator />
+            </div>
+            {roomState.gameState.winners.map((val, index)=>{
+              return             <div
+              className={`text-sm text-green-400`}
+              key={index}
+            >
+              {val == playerState?.username
+                ? playerState.username + " (You)"
+                : val}
+            </div>
+
+            })}
+          </>}
         <div className="">
           <h1 className="">Players in the room</h1>
           <Separator />
@@ -82,7 +99,7 @@ export default function Play() {
             <div
               className={`text-sm ${
                 index == roomState.gameState.currentPlayerIndex &&
-                "underline text-green-400"
+                "underline text-blue-400"
               }`}
               key={index}
             >
