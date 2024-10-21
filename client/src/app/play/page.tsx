@@ -67,7 +67,7 @@ export default function Play() {
 
   return (
     <div className="relative flex flex-col w-full h-screen">
-      <div className="fixed z-50 flex flex-col justify-center items-start p-2 gap-2">
+      <div className="fixed z-50 backdrop-blur-md dark:bg-black dark:bg-opacity-50 rounded-md  flex flex-col justify-center items-start p-2 gap-2">
         {roomState?.gameState.winners &&  roomState?.gameState.winners.length > 0 && <>
             <div>
               <h1>Winners</h1>
@@ -105,7 +105,7 @@ export default function Play() {
           );
         })}
         <Separator />
-        {currentPlayerIndex == roomState?.gameState.currentPlayerIndex && <RainbowButton className="cursor-pointer" onClick={() => {handleDraw()}}>Utha le</RainbowButton>}
+        {currentPlayerIndex == roomState?.gameState.currentPlayerIndex && <RainbowButton className="cursor-pointer w-full" onClick={() => {handleDraw()}}>Utha le</RainbowButton>}
       </div>
       <div className="relative flex flex-col justify-center items-center">
         <OnoCard

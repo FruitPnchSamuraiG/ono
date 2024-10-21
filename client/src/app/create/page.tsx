@@ -41,9 +41,9 @@ export default function Create() {
     socket.on("roomState", message => {
       setPlayerState({username: data.username, hand: []})
       setRoomState(message)
+      router.push('play')
     })
     toast.success(`Room ${data.roomId} has been created!`)
-    router.push('play')
   };
   return (
     <div className="flex flex-col justify-center items-center w-full h-screen">
