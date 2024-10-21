@@ -52,9 +52,12 @@ export function validateMove(topMostCard: Card, currentCard: Card) {
   } else return false
 }
 
-export function updatePlayerTurn(length: number, current: number) {
-  if (current == length - 1) return 0;
-  else return current + 1;
+export function updatePlayerTurn(length: number, current: number, cardValue?: string): number {
+  let turn = current;
+  if (cardValue == "skip") {
+    turn = (current + 2) % length 
+  } else turn = (current + 1) % length 
+  return turn
 }
 
 export function validateWin(playerHand: Card[]) {
@@ -68,7 +71,7 @@ export function calculateStacked(discardDeck: Card[]) {
   for (let i = discardDeck.length - 1; i >= 0; i--) {
     const curr = discardDeck[i]
     if (curr.type != "special" || curr.value == "colourChange") {
-      if(i == discardDeck.length - 1) numberOfCards++ // this fixes an off by one error jab uthana padta hai
+      if (i == discardDeck.length - 1) numberOfCards++ // this fixes an off by one error jab uthana padta hai
       break;
     }
     if (curr.value == "draw4") numberOfCards += 4
