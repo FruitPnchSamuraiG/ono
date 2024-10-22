@@ -59,6 +59,7 @@ export function updatePlayerTurn(length: number, current: number, direction: num
   if (cardValue == "skip") {
     turn = (current + (2 * direction)) % length
   } else turn = (current + (1 * direction)) % length
+  if(turn < 0) turn += length
   return {turn, direction}
 }
 
