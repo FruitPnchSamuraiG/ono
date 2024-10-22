@@ -56,10 +56,11 @@ export function validateMove(topMostCard: Card, currentCard: Card) {
 export function updatePlayerTurn(length: number, current: number, direction: number, cardValue?: string) {
   let turn = current;
   if (cardValue == "reverse") direction = direction * -1
-  if (cardValue == "skip") {
-    turn = (current + (2 * direction)) % length
-  } else turn = (current + (1 * direction)) % length
-  if(turn < 0) turn += length
+  if (cardValue === "skip") {
+    turn = (current + 2) % length; // Skip the next player
+  } else {
+    turn = (current + 1) % length; // Regular move
+  }
   return {turn, direction}
 }
 
