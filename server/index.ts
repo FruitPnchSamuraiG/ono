@@ -17,6 +17,7 @@ let games: Room[] = []
 // basic rundown, for connection
 io.on("connection", (socket) => {
   socket.on("create", (message: Room & { username: string }) => {
+    if(games.find(val => {val.roomId == message.roomId})) return
     console.log(message.username, "created a room")
     // initializing a deck of 110
     const drawDeck = initializeDeck()
