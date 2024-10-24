@@ -93,7 +93,7 @@ io.on("connection", (socket) => {
         // updating the discard deck, we can optimize this here by only having stackable cards in the discard deck (not yet)
         room.gameState.discardDeck.push(message.card)
         // updating the current player
-        const { turn, direction } = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex, room.gameState.direction)
+        const { turn, direction } = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex, room.gameState.direction, message.card.value)
         room.gameState.currentPlayerIndex = turn
         room.gameState.direction = direction
         room.lastActive = Date.now()
@@ -110,7 +110,7 @@ io.on("connection", (socket) => {
         }
         // removing cards from the draw deck
         for (let i = 0; i < 8; i++) room.gameState.drawDeck.pop()
-        const { turn, direction } = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex, room.gameState.direction)
+        const { turn, direction } = updatePlayerTurn(room.players.length, room.gameState.currentPlayerIndex, room.gameState.direction, message.card.value)
         room.gameState.currentPlayerIndex = turn
         room.gameState.direction = direction
         room.lastActive = Date.now()
