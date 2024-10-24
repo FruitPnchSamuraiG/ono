@@ -6,7 +6,7 @@ import { calculateStacked, dealCards, initializeDeck, updatePlayerTurn, validate
 const httpServer = createServer()
 const io = new Server(httpServer, {
   cors: {
-    origin: "*", // Allow all origins or specify your client URL
+    origin: "https://ono.llocal.in", // Allow all origins or specify your client URL
     methods: ["GET", "POST"],
     credentials: true
   }
