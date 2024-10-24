@@ -59,10 +59,9 @@ export function updatePlayerTurn(length: number, current: number, direction: num
     direction = direction * -1
   }
   else if (cardValue == "skip") {
-    current = (current + 2) % (length); // Skip the next player
-
+    current = ((current + 2)*direction + length**length) % (length); // Skip the next player
   } else {
-    current = (current + 1) % (length); // Regular move
+    current = ((current + 1) *direction + length**length) % (length); // Regular move
   }
   turn = current
   return {turn, direction} 
